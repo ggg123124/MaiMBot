@@ -92,7 +92,7 @@ HOST=127.0.0.1
 PORT=8081
 
 # 这些是数据库设置，一般也不用改呢
-MONGODB_HOST=127.0.0.1
+MONGODB_HOST=127.0.0.1  # 如果使用Docker部署，需要改成数据库容器的名字喵，默认是mongodb喵
 MONGODB_PORT=27017
 DATABASE_NAME=MegBot
 MONGODB_USERNAME = ""  # 如果数据库需要用户名，就在这里填写喵
