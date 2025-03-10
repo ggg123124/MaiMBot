@@ -13,6 +13,8 @@ from ..utils.typo_generator import ChineseTypoGenerator
 from .config import global_config
 from .message import Message
 
+import re
+
 driver = get_driver()
 config = driver.config
 
@@ -214,8 +216,12 @@ def get_recent_group_detailed_plain_text(db, group_id: int, limit: int = 12, com
         return message_detailed_plain_text_list
 
 
+def contains_chinese(text: str) -> bool:
+    """判断字符串是否包含中文字符"""
+    return bool(re.search('[\u4e00-\u9fff]', text))
+
 def split_into_sentences_w_remove_punctuation(text: str) -> List[str]:
-    """将文本分割成句子，但保持书名号中的内容完整
+    """将文本分割成句子，但保持书名号中的内容完整，且仅当句子包含中文字符时分割
     Args:
         text: 要分割的文本字符串
     Returns:
@@ -233,30 +239,18 @@ def split_into_sentences_w_remove_punctuation(text: str) -> List[str]:
         split_strength = 0.7
     else:
         split_strength = 0.9
-    # 先移除换行符
-    # print(f"split_strength: {split_strength}")
-
-    # print(f"处理前的文本: {text}")
-
     # 统一将英文逗号转换为中文逗号
     text = text.replace(',', '，')
     text = text.replace('\n', ' ')
-
-    # print(f"处理前的文本: {text}")
-
     text_no_1 = ''
     for letter in text:
-        # print(f"当前字符: {letter}")
         if letter in ['!', '！', '?', '？']:
-            # print(f"当前字符: {letter}, 随机数: {random.random()}")
             if random.random() < split_strength:
                 letter = ''
         if letter in ['。', '…']:
-            # print(f"当前字符: {letter}, 随机数: {random.random()}")
             if random.random() < 1 - split_strength:
                 letter = ''
         text_no_1 += letter
-
     # 对每个逗号单独判断是否分割
     sentences = [text_no_1]
     new_sentences = []
@@ -264,7 +258,7 @@ def split_into_sentences_w_remove_punctuation(text: str) -> List[str]:
         parts = sentence.split('，')
         current_sentence = parts[0]
         for part in parts[1:]:
-            if random.random() < split_strength:
+            if random.random() < split_strength and contains_chinese(current_sentence):
                 new_sentences.append(current_sentence.strip())
                 current_sentence = part
             else:
@@ -273,15 +267,13 @@ def split_into_sentences_w_remove_punctuation(text: str) -> List[str]:
         space_parts = current_sentence.split(' ')
         current_sentence = space_parts[0]
         for part in space_parts[1:]:
-            if random.random() < split_strength:
+            if random.random() < split_strength and contains_chinese(current_sentence):
                 new_sentences.append(current_sentence.strip())
                 current_sentence = part
             else:
                 current_sentence += ' ' + part
         new_sentences.append(current_sentence.strip())
     sentences = [s for s in new_sentences if s]  # 移除空字符串
-
-    # print(f"分割后的句子: {sentences}")
     sentences_done = []
     for sentence in sentences:
         sentence = sentence.rstrip('，,')
@@ -290,7 +282,6 @@ def split_into_sentences_w_remove_punctuation(text: str) -> List[str]:
         elif random.random() < split_strength:
             sentence = sentence.replace('，', ' ').replace(',', ' ')
         sentences_done.append(sentence)
-
     print(f"处理后的句子: {sentences_done}")
     return sentences_done
 
@@ -339,7 +330,7 @@ def process_llm_response(text: str) -> List[str]:
     typoed_text = typo_generator.create_typo_sentence(text)[0]
     sentences = split_into_sentences_w_remove_punctuation(typoed_text)
     # 检查分割后的消息数量是否过多（超过3条）
-    if len(sentences) > 4:
+    if len(sentences) > 10:
         print(f"分割后消息数量过多 ({len(sentences)} 条)，返回默认回复")
         return [f'{global_config.BOT_NICKNAME}不知道哦']
 

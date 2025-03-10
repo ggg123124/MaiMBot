@@ -69,7 +69,7 @@ env_config = {key: os.getenv(key) for key in os.environ}
 
 # 设置基础配置
 base_config = {
-    "websocket_port": int(env_config.get("PORT", 8080)),
+    "websocket_port": int(env_config.get("PORT", 8081)),
     "host": env_config.get("HOST", "127.0.0.1"),
     "log_level": "INFO",
 }

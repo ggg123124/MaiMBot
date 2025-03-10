@@ -89,7 +89,7 @@ CHAT_ANY_WHERE_BASE_URL=https://api.chatanywhere.tech/v1
 
 # 如果你不知道这是什么，那么下面这些不用改，保持原样就好啦
 HOST=127.0.0.1
-PORT=8080
+PORT=8081
 
 # 这些是数据库设置，一般也不用改呢
 MONGODB_HOST=127.0.0.1

@@ -53,7 +53,7 @@ CHAT_ANY_WHERE_BASE_URL=https://api.chatanywhere.tech/v1
 
 # 服务配置
 HOST=127.0.0.1
-PORT=8080
+PORT=8081
 
 # 数据库配置
 MONGODB_HOST=127.0.0.1
