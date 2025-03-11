@@ -11,9 +11,9 @@ class WillingManager:
     async def _decay_reply_willing(self):
         """定期衰减回复意愿"""
         while True:
-            await asyncio.sleep(5)
+            await asyncio.sleep(10)
             for group_id in self.group_reply_willing:
-                self.group_reply_willing[group_id] = max(0, self.group_reply_willing[group_id] * 0.6)
+                self.group_reply_willing[group_id] = max(0, self.group_reply_willing[group_id] * 0.9)
                 
     def get_willing(self, group_id: int) -> float:
         """获取指定群组的回复意愿"""
